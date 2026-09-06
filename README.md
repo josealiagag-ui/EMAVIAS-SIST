@@ -12,32 +12,34 @@ Sistema web fullstack para la gestión de obras viales y despachos de asfalto.
 Ver GUIA-INSTALACION.md para instrucciones detalladas.
 
 ## Estructura del Proyecto
-emavias-sistema/
-├── emavias-backend/          ← API REST (Node.js + Express)
-│   ├── src/
-│   │   ├── routes/
-│   │   │   ├── auth.js       ← Autenticación JWT
-│   │   │   ├── obras.js      ← CRUD Obras (5 rutas)
-│   │   │   └── despachos.js  ← CRUD Despachos (5 rutas + 1 stats)
-│   │   ├── middleware/
-│   │   │   └── auth.js       ← Middleware JWT
-│   │   ├── database.js       ← SQLite + datos de ejemplo
-│   │   └── app.js            ← Punto de entrada
-│   ├── .env                  ← Variables de entorno
-│   └── package.json
+```
+emavias-sist/
+├── emavias-backend/
+│ ├── src/
+│ │ ├── routes/
+│ │ │ ├── auth.js
+│ │ │ ├── obras.js
+│ │ │ └── despachos.js
+│ │ ├── middleware/
+│ │ │ └── auth.js
+│ │ ├── database.js
+│ │ └── app.js
+│ └── package.json
 │
-└── emavias-frontend/         ← App React (Vite)
-    ├── src/
-    │   ├── api/axios.js      ← Cliente HTTP con interceptores
-    │   ├── context/          ← AuthContext (estado global)
-    │   ├── components/       ← Navbar, Layout, PrivateRoute
-    │   └── pages/
-    │       ├── Login.jsx
-    │       ├── Dashboard.jsx
-    │       ├── obras/        ← ObrasList, ObrasForm, ObrasDetail
-    │       └── despachos/    ← DespachosList, DespachosForm
-    ├── .env
-    └── package.json
+└── emavias-frontend/
+├── src/
+│ ├── api/axios.js
+│ ├── context/
+│ ├── components/
+│ └── pages/
+│ ├── Login.jsx
+│ ├── Dashboard.jsx
+│ ├── obras/
+│ └── despachos/
+├── index.html
+├── vite.config.js
+└── package.json
+```
 
 ## Credenciales de prueba
 - admin / 1234

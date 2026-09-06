@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import api from '../../api/axios';
 import Layout from '../../components/Layout';
@@ -9,10 +9,24 @@ const INITIAL = {
   longitud: '', ancho: 1, area: '',
   tipo: 'ASFALTADO', grupo: '', estado: 'Planificado',
   personal: 12, horas: 8,
-  boleta_mezcla: '', cant_mezcla: 0,
+  cant_mezcla: 0,
   tipo_ligante: '', cant_ligante: 0,
   observaciones: ''
 };
+
+const Field = ({ label, name, type='text', required, options, form, errors, handleChange, ...props }) => (
+  <div className="mb-3">
+    <label className="form-label small fw-semibold text-muted">{label}{required && <span className="text-danger ms-1">*</span>}</label>
+    {options ? (
+      <select name={name} className={`form-select${errors[name]?' is-invalid':''}`} value={form[name]??''} onChange={handleChange} {...props}>
+        {options.map(o => typeof o === 'string' ? <option key={o}>{o}</option> : <option key={o.v} value={o.v}>{o.l}</option>)}
+      </select>
+    ) : (
+      <input type={type} name={name} className={`form-control${errors[name]?' is-invalid':''}`} value={form[name]??''} onChange={handleChange} {...props}/>
+    )}
+    {errors[name] && <div className="invalid-feedback">{errors[name]}</div>}
+  </div>
+);
 
 export default function ObrasForm() {
   const { id } = useParams();
@@ -85,19 +99,6 @@ export default function ObrasForm() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const Field = ({ label, name, type='text', required, options, ...props }) => (
-    <div className="mb-3">
-      <label className="form-label small fw-semibold text-muted">{label}{required && <span className="text-danger ms-1">*</span>}</label>
-      {options ? (
-        <select name={name} className={`form-select${errors[name]?' is-invalid':''}`} value={form[name]??''} onChange={handleChange} {...props}>
-          {options.map(o => typeof o === 'string' ? <option key={o}>{o}</option> : <option key={o.v} value={o.v}>{o.l}</option>)}
-        </select>
-      ) : (
-        <input type={type} name={name} className={`form-control${errors[name]?' is-invalid':''}`} value={form[name]??''} onChange={handleChange} {...props}/>
-      )}
-      {errors[name] && <div className="invalid-feedback">{errors[name]}</div>}
-    </div>
-  );
 
   if (loading) return <Layout><div className="text-center py-5"><div className="spinner-border text-warning"/></div></Layout>;
 
@@ -132,18 +133,18 @@ export default function ObrasForm() {
               </div>
               <div className="card-body">
                 <div className="row g-2">
-                  <div className="col-6"><Field label="Fecha" name="fecha" type="date" required/></div>
-                  <div className="col-6"><Field label="Código" name="codigo" placeholder="EMA-47" required/></div>
-                  <div className="col-12"><Field label="Unidad de Ejecución" name="unidad" placeholder="MALLASILLA" required/></div>
-                  <div className="col-12"><Field label="Ubicación" name="ubicacion" placeholder="AV. NOMBRE - TRAMO" required/></div>
-                  <div className="col-6"><Field label="Zona" name="zona" placeholder="ZONA" required/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Fecha" name="fecha" type="date" required/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Código" name="codigo" placeholder="EMA-47" required/></div>
+                  <div className="col-12"><Field form={form} errors={errors} handleChange={handleChange} label="Unidad de Ejecución" name="unidad" placeholder="MALLASILLA" required/></div>
+                  <div className="col-12"><Field form={form} errors={errors} handleChange={handleChange} label="Ubicación" name="ubicacion" placeholder="AV. NOMBRE - TRAMO" required/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Zona" name="zona" placeholder="ZONA" required/></div>
                   <div className="col-6">
-                    <Field label="Estado" name="estado" options={['Planificado','En Ejecucion','Completado']}/>
+                    <Field form={form} errors={errors} handleChange={handleChange} label="Estado" name="estado" options={['Planificado','En Ejecucion','Completado']}/>
                   </div>
                   <div className="col-4">
-                    <Field label="Tipo" name="tipo" options={['ASFALTADO','BACHEO','BASE']}/>
+                    <Field form={form} errors={errors} handleChange={handleChange} label="Tipo" name="tipo" options={['ASFALTADO','BACHEO','BASE']}/>
                   </div>
-                  <div className="col-8"><Field label="Grupo" name="grupo" placeholder="ASFALTO 1"/></div>
+                  <div className="col-8"><Field form={form} errors={errors} handleChange={handleChange} label="Grupo" name="grupo" placeholder="ASFALTO 1"/></div>
                 </div>
               </div>
             </div>
@@ -157,15 +158,14 @@ export default function ObrasForm() {
               </div>
               <div className="card-body">
                 <div className="row g-2">
-                  <div className="col-4"><Field label="Longitud (m)" name="longitud" type="number" step="0.01" placeholder="0"/></div>
-                  <div className="col-4"><Field label="Ancho" name="ancho" type="number" step="0.01" placeholder="1"/></div>
-                  <div className="col-4"><Field label="Área (m²)" name="area" type="number" step="0.01" placeholder="0"/></div>
-                  <div className="col-6"><Field label="N° Boleta Mezcla" name="boleta_mezcla" placeholder="3000"/></div>
-                  <div className="col-6"><Field label="Cant. Mezcla (T)" name="cant_mezcla" type="number" step="0.01"/></div>
-                  <div className="col-6"><Field label="Tipo Ligante" name="tipo_ligante" placeholder="MC30 / MC70 / RC250"/></div>
-                  <div className="col-6"><Field label="Cant. Ligante (L)" name="cant_ligante" type="number" step="0.01"/></div>
-                  <div className="col-6"><Field label="Personal" name="personal" type="number"/></div>
-                  <div className="col-6"><Field label="Horas trabajadas" name="horas" type="number"/></div>
+                  <div className="col-4"><Field form={form} errors={errors} handleChange={handleChange} label="Longitud (m)" name="longitud" type="number" step="0.01" placeholder="0"/></div>
+                  <div className="col-4"><Field form={form} errors={errors} handleChange={handleChange} label="Ancho" name="ancho" type="number" step="0.01" placeholder="1"/></div>
+                  <div className="col-4"><Field form={form} errors={errors} handleChange={handleChange} label="Área (m²)" name="area" type="number" step="0.01" placeholder="0"/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Mezcla Requerida (m³)" name="cant_mezcla" type="number" step="0.01" min="0"/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Tipo Ligante" name="tipo_ligante" placeholder="MC30 / MC70 / RC250"/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Cant. Ligante (L)" name="cant_ligante" type="number" step="0.01"/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Personal" name="personal" type="number"/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Horas trabajadas" name="horas" type="number"/></div>
                 </div>
               </div>
             </div>
@@ -195,3 +195,4 @@ export default function ObrasForm() {
     </Layout>
   );
 }
+

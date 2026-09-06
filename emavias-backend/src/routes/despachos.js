@@ -121,6 +121,47 @@ router.put('/:id', (req, res) => {
   }
 });
 
+
+// GET /api/despachos/mezcla-stats/:codigo_obra
+// Devuelve total despachado vs requerido para una obra
+router.get('/mezcla-stats/:codigo_obra', (req, res) => {
+  try {
+    const { codigo_obra } = req.params;
+
+    const obra = db.prepare(
+      'SELECT cant_mezcla, ubicacion, zona FROM obras WHERE codigo = ?'
+    ).get(codigo_obra);
+
+    if (!obra) return res.status(404).json({ error: 'Obra no encontrada' });
+
+    const stats = db.prepare(`
+      SELECT
+        COUNT(*) as total_viajes,
+        COALESCE(SUM(vol_m3), 0) as total_despachado
+      FROM despachos
+      WHERE codigo_obra = ?
+    `).get(codigo_obra);
+
+    const requerido   = parseFloat(obra.cant_mezcla) || 0;
+    const despachado  = parseFloat(stats.total_despachado) || 0;
+    const disponible  = requerido - despachado;
+    const porcentaje  = requerido > 0 ? Math.min(Math.round((despachado / requerido) * 100), 100) : 0;
+
+    res.json({
+      data: {
+        requerido,
+        despachado: Math.round(despachado * 100) / 100,
+        disponible: Math.round(disponible * 100) / 100,
+        porcentaje,
+        total_viajes: stats.total_viajes,
+        excedido: despachado > requerido && requerido > 0
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // DELETE /api/despachos/:id - delete despacho
 router.delete('/:id', (req, res) => {
   try {

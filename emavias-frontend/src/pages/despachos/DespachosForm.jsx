@@ -18,6 +18,25 @@ const CONDUCTORES = [
   'Magarinos Loredo Jaime','Merma Garcia Santos Ricardo'
 ];
 
+const Field = ({ label, name, type='text', required, options, list, form, errors, handleChange, ...props }) => (
+  <div className="mb-3">
+    <label className="form-label small fw-semibold text-muted">{label}{required && <span className="text-danger ms-1">*</span>}</label>
+    {options ? (
+      <select name={name} className={`form-select${errors[name]?' is-invalid':''}`} value={form[name]??''} onChange={handleChange} {...props}>
+        <option value="">Seleccione...</option>
+        {options.map(o => typeof o === 'string' ? <option key={o}>{o}</option> : <option key={o.v} value={o.v}>{o.l}</option>)}
+      </select>
+    ) : (
+      <>
+        <input type={type} name={name} className={`form-control${errors[name]?' is-invalid':''}`}
+               value={form[name]??''} onChange={handleChange} list={list} {...props}/>
+        {list && <datalist id={list}>{(props.suggestions||[]).map(s=><option key={s} value={s}/>)}</datalist>}
+      </>
+    )}
+    {errors[name] && <div className="invalid-feedback">{errors[name]}</div>}
+  </div>
+);
+
 export default function DespachosForm() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,6 +48,7 @@ export default function DespachosForm() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState(null);
+  const [mezclaStats, setMezclaStats] = useState(null);
 
   useEffect(() => {
     // Load obras for dropdown
@@ -50,6 +70,7 @@ export default function DespachosForm() {
     if (name === 'codigo_obra') {
       const obra = obras.find(o => o.codigo === value);
       if (obra) setForm(prev => ({ ...prev, codigo_obra: value, destino: `${obra.zona} ${obra.ubicacion}` }));
+      fetchMezclaStats(value);
     }
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
@@ -86,29 +107,22 @@ export default function DespachosForm() {
     } finally { setSaving(false); }
   };
 
+
+  const fetchMezclaStats = async (codigo) => {
+    if (!codigo) { setMezclaStats(null); return; }
+    try {
+      const res = await api.get(`/despachos/mezcla-stats/${codigo}`);
+      setMezclaStats(res.data.data);
+    } catch {
+      setMezclaStats(null);
+    }
+  };
+
   const showToast = (msg, type) => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 4000);
   };
 
-  const Field = ({ label, name, type='text', required, options, list, ...props }) => (
-    <div className="mb-3">
-      <label className="form-label small fw-semibold text-muted">{label}{required && <span className="text-danger ms-1">*</span>}</label>
-      {options ? (
-        <select name={name} className={`form-select${errors[name]?' is-invalid':''}`} value={form[name]??''} onChange={handleChange} {...props}>
-          <option value="">Seleccione...</option>
-          {options.map(o => typeof o === 'string' ? <option key={o}>{o}</option> : <option key={o.v} value={o.v}>{o.l}</option>)}
-        </select>
-      ) : (
-        <>
-          <input type={type} name={name} className={`form-control${errors[name]?' is-invalid':''}`}
-                 value={form[name]??''} onChange={handleChange} list={list} {...props}/>
-          {list && <datalist id={list}>{(props.suggestions||[]).map(s=><option key={s} value={s}/>)}</datalist>}
-        </>
-      )}
-      {errors[name] && <div className="invalid-feedback">{errors[name]}</div>}
-    </div>
-  );
 
   if (loading) return <Layout><div className="text-center py-5"><div className="spinner-border text-warning"/></div></Layout>;
 
@@ -143,18 +157,18 @@ export default function DespachosForm() {
               </div>
               <div className="card-body">
                 <div className="row g-2">
-                  <div className="col-6"><Field label="Fecha" name="fecha" type="date" required/></div>
-                  <div className="col-6"><Field label="Hora" name="hora" type="time" required/></div>
-                  <div className="col-6"><Field label="N° Boleta" name="n_boleta" placeholder="3500" required/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Fecha" name="fecha" type="date" required/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Hora" name="hora" type="time" required/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="N° Boleta" name="n_boleta" placeholder="3500" required/></div>
                   <div className="col-6">
-                    <Field label="Tipo de Mezcla" name="tipo_mezcla" options={['Bacheo','Carpeta','Base']} required/>
+                    <Field form={form} errors={errors} handleChange={handleChange} label="Tipo de Mezcla" name="tipo_mezcla" options={['Bacheo','Carpeta','Base']} required/>
                   </div>
-                  <div className="col-6"><Field label="Volumen (m³)" name="vol_m3" type="number" step="0.01" placeholder="8"/></div>
-                  <div className="col-6"><Field label="Temperatura (°C)" name="temperatura" type="number" step="0.1" placeholder="155"/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Volumen (m³)" name="vol_m3" type="number" step="0.01" placeholder="8"/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Temperatura (°C)" name="temperatura" type="number" step="0.1" placeholder="155"/></div>
                   <div className="col-6">
-                    <Field label="Planta" name="planta" options={PLANTAS}/>
+                    <Field form={form} errors={errors} handleChange={handleChange} label="Planta" name="planta" options={PLANTAS}/>
                   </div>
-                  <div className="col-6"><Field label="Responsable" name="responsable" placeholder="Victor 21 / INTECONS"/></div>
+                  <div className="col-6"><Field form={form} errors={errors} handleChange={handleChange} label="Responsable" name="responsable" placeholder="Victor 21 / INTECONS"/></div>
                 </div>
               </div>
             </div>
@@ -178,9 +192,44 @@ export default function DespachosForm() {
                   </select>
                   {errors.codigo_obra && <div className="invalid-feedback">{errors.codigo_obra}</div>}
                 </div>
-                <Field label="Destino (descripción)" name="destino" placeholder="Zona Ubicación"/>
+                <Field form={form} errors={errors} handleChange={handleChange} label="Destino (descripción)" name="destino" placeholder="Zona Ubicación"/>
               </div>
             </div>
+
+
+            {/* Widget mezcla */}
+            {mezclaStats && mezclaStats.requerido > 0 && (
+              <div className={`alert border-0 shadow-sm mb-3 p-3 ${mezclaStats.excedido ? 'alert-danger' : mezclaStats.porcentaje >= 85 ? 'alert-warning' : 'alert-info'}`}>
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <small className="fw-bold">
+                    <i className={`bi bi-${mezclaStats.excedido ? 'exclamation-triangle-fill' : mezclaStats.porcentaje >= 85 ? 'exclamation-circle' : 'bar-chart-fill'} me-1`}/>
+                    Mezcla para esta obra
+                  </small>
+                  <small className="fw-bold">{mezclaStats.porcentaje}%</small>
+                </div>
+                <div className="progress mb-2" style={{height: 8}}>
+                  <div
+                    className={`progress-bar ${mezclaStats.excedido ? 'bg-danger' : mezclaStats.porcentaje >= 85 ? 'bg-warning' : 'bg-info'}`}
+                    style={{width: `${Math.min(mezclaStats.porcentaje, 100)}%`}}
+                  />
+                </div>
+                <div className="d-flex justify-content-between">
+                  <small>Despachado: <strong>{mezclaStats.despachado} m³</strong> ({mezclaStats.total_viajes} viajes)</small>
+                  <small>Requerido: <strong>{mezclaStats.requerido} m³</strong></small>
+                </div>
+                {mezclaStats.excedido ? (
+                  <div className="mt-1 text-danger fw-bold small">
+                    <i className="bi bi-exclamation-triangle-fill me-1"/>
+                    ¡EXCEDIDO en {Math.abs(mezclaStats.disponible).toFixed(2)} m³! Verifique antes de registrar.
+                  </div>
+                ) : (
+                  <div className="mt-1 small">
+                    Disponible: <strong>{mezclaStats.disponible.toFixed(2)} m³</strong>
+                    {mezclaStats.porcentaje >= 85 && <span className="text-warning fw-bold ms-2">⚠ Cerca del límite</span>}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="card border-0 shadow-sm">
               <div className="card-header bg-white border-bottom">

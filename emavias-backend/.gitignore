@@ -1,0 +1,5 @@
+node_modules/
+emavias.db
+.env
+*.db-shm
+*.db-wal

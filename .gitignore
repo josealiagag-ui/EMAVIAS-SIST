@@ -1,0 +1,24 @@
+﻿# Node modules
+node_modules/
+*/node_modules/
+
+# Bases de datos
+*.db
+*.db-shm
+*.db-wal
+
+# Variables de entorno
+.env
+*/.env
+
+# Build de producción
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

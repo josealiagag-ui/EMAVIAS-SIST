@@ -1,0 +1,57 @@
+/* EMAVÍAS - Custom styles */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #f0f4f8;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Navbar active link */
+.navbar-nav .nav-link.active {
+  background: rgba(255,255,255,0.15);
+  border-radius: 6px;
+  font-weight: 600;
+  color: #ffc107 !important;
+}
+
+/* Card hover */
+.card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Table styles */
+.table > tbody > tr:hover {
+  background-color: rgba(45, 106, 159, 0.05) !important;
+}
+
+/* Bootstrap badge fix */
+.badge { font-weight: 500; }
+
+/* Scrollable table wrapper */
+.table-responsive { overflow-x: auto; }
+
+/* Form focus color */
+.form-control:focus, .form-select:focus {
+  border-color: #2d6a9f;
+  box-shadow: 0 0 0 0.2rem rgba(45, 106, 159, 0.25);
+}
+
+/* Progress bar animation */
+.progress-bar { transition: width 0.6s ease; }
+
+/* Sidebar-like nav on mobile */
+@media (max-width: 768px) {
+  .navbar-collapse { padding: 1rem 0; }
+  .navbar-nav .nav-link { padding: 0.5rem 0.75rem; }
+}
+
+/* Print-friendly */
+@media print {
+  .navbar, .btn, footer { display: none !important; }
+}

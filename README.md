@@ -5,8 +5,18 @@ Sistema web fullstack para la gestión de obras viales y despachos de asfalto.
 **Empresa Municipal de Asfaltos y Vías · Gerencia Técnica · La Paz, Bolivia**
 
 ## Tecnologías
-- Backend: Node.js + Express + SQLite + JWT
-- Frontend: React 18 + Vite + Bootstrap 5
+### Backend
+- Node.js + Express — API REST
+- better-sqlite3 — Base de datos SQLite
+- jsonwebtoken — Autenticación JWT
+- bcryptjs — Hash de contraseñas
+- cors + dotenv
+
+### Frontend
+- React 18 + Vite
+- React Router DOM — Enrutamiento SPA
+- Axios — Cliente HTTP
+- Bootstrap 5 + Bootstrap Icons
 
 ## Instalación
 Ver GUIA-INSTALACION.md para instrucciones detalladas.
